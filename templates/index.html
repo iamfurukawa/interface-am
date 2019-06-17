@@ -110,6 +110,7 @@
 						<i>Esse review é: Negative, Deceptive</i>
 					</div>
 					<div class="mt-2 text-right">
+							<button id="trocar-sample" type="button" class="btn btn-outline-primary">Mudar Exemplo</button>
 							<button id="copiar" type="button" class="btn btn-outline-primary">Copiar</button>
 						</div>
 				</div>
@@ -128,6 +129,25 @@
 			let example = document.getElementById('suggest-container').innerHTML;
 			$('#textToAnalize').val(example);
 		});
+
+		$('#trocar-sample').click(function(){
+			$.ajax({
+				  url : "example",
+				  type : 'post',
+				  data : {},
+				  beforeSend : function(){
+					   console.log('Enviando...')
+				  }
+			 })
+			 .done(function(msg){
+		     	document.getElementById('suggest-container').innerHTML = msg.example;
+				document.getElementById('suggest-polarity').innerHTML = '<i>Esse review é: ' + msg.category + '</i>';
+			 })
+			 .fail(function(jqXHR, textStatus, msg){
+				  alert(msg);
+			 });
+		});
+
 
 		$('#executar').click(function(){
 			let review = $('#textToAnalize').val();
@@ -159,23 +179,5 @@
 				  alert(msg);
 			 });
 		 });
-		
-		setInterval(function() {
-		 	$.ajax({
-				  url : "example",
-				  type : 'post',
-				  data : {},
-				  beforeSend : function(){
-					   console.log('Enviando...')
-				  }
-			 })
-			 .done(function(msg){
-		     	document.getElementById('suggest-container').innerHTML = msg.example;
-				document.getElementById('suggest-polarity').innerHTML = '<i>Esse review é: ' + msg.category + '</i>';
-			 })
-			 .fail(function(jqXHR, textStatus, msg){
-				  alert(msg);
-			 });
-		 }, 60 * 1000);
 	</script>
 </html>
