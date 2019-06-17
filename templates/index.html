@@ -1,0 +1,137 @@
+<html>
+	<head>
+		<title>Deteção de fake review</title>
+		<link rel="stylesheet" 
+			  href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+			  integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<script
+		  src="https://code.jquery.com/jquery-3.4.1.js"
+		  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+		  crossorigin="anonymous">
+		</script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" 
+				integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" 
+				crossorigin="anonymous">
+		</script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" 
+				integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" 
+				crossorigin="anonymous">
+		</script>
+		<style type="text/css">
+			body{
+				background-color: lightgray
+			}
+
+			header {
+				background-color: white;
+			}
+			
+			textarea {
+				resize: none;
+			}
+			
+			.box{
+				background-color: white;
+				border-radius: 10px;
+			}
+			
+			#suggest-container{
+				height: 251px;
+				overflow-y: auto;
+				text-align: justify;
+			}
+
+            @media (max-width: 1200px) {
+                body {
+                    font-size: 0.9em !important;
+                }
+            }
+		</style>
+	</head>
+	<body>
+		<header class="w-100 p-3">
+			<h3><center><b>DETECÇÃO DE FAKE REVIEW</b></center></h3>
+		</header>
+		<div class="col-12 d-flex d-flex-row flex-wrap justify-content-center mt-4">
+			<div class="col-sm-12 col-md-6 col-lg-5 mb-3">
+				<div class="p-3 box">
+					<div class="form-group">
+						<label for="textToAnalize">Digite aqui o texto a ser analizado:</label>
+						<textarea class="form-control" id="textToAnalize" rows="12"></textarea>
+					</div>
+					<div class="d-flex d-flex-row flex-wrap">
+						<select class="custom-select col-sm-12 col-md-12 col-lg-8 mb-sm-3 mb-md-3 mb-lg-0" id="polaridade">
+							<option selected>Escolha a polaridade do review...</option>
+							<option value="positive">Positivo</option>
+							<option value="negative">Negativo</option>
+							<option value="both">Ambos</option>
+						</select>
+						<div class="col-sm-12 col-md-12 col-lg-4 pr-0 pl-sm-0 pl-md-0 pl-lg-3"><button type="button" class="btn btn-outline-primary btn-block">Executar</button></div>
+					</div>
+				</div>
+				<div class="p-3 mt-3 box" id='result'>
+					Este review foi classificado como:
+				</div>
+			</div>
+			<div class="col-sm-12 col-md-5 col-lg-4">
+                <div class="p-4 box">
+                    <h4>Mais informações</h4>
+                    <p class="text-muted">Para saber mais sobre este projeto clique <a href='https://drive.google.com/file/d/1jnaD_iGn6b7svogVKp30d8scd6LwkzKL/view?usp=sharing'>aqui</a>.</p>
+                    <hr>
+                    <h4>Exemplos</h4>
+                    <p class="text-muted">Abaixo seguem alguns exemplos de reviews. Sinta-se a vontade para utilizá-los :)</p>
+                    <div id='suggest-container'>
+                        Affinia Chicago is one of the worst hotels I have ever stayed at. Not in my life have I been treated so poorly as a guest. The front desk was very unaccommodating when I asked for a smoke free room when they had made an error in my reservation. There was no bellhop available for some strange reason so I had to move all my luggage to the elevator and down a long hallway to my room by myself. If it wasn't already a bad stay, I ordered room service and it took over an hour and a half to be delivered. If they didn't have air conditioning in the room, I would say just about everything about this stay was completely miserable. If you are traveling to Chicago for any kind of business, I hope you decide not to choose this hotel. I was quite surprised, I like Chicago as a city but this stay definitely made my trip quite a negative experience. <i><br><br>Esse review é: Negative, Deceptive</i>
+                    </div>
+                </div>
+			</div>
+		</div>
+	</body>
+	<footer>
+	</footer>
+	
+	<script>		
+		$('button').click(function(){
+			let review = $('#textToAnalize').val();
+			let option = $('#polaridade').val();
+						
+			$.ajax({
+				  url : "compute",
+				  type : 'post',
+				  data : {
+					   type : option,
+					   text : review
+				  },
+				  beforeSend : function(){
+					   console.log('Enviando...')
+				  }
+			 })
+			 .done(function(msg){
+				  if(msg.status == 'OK')
+					  if(msg.predicao == "1") document.getElementById('result').innerHTML = 'Este review foi classificado como: <b class="text-danger">Fake</b>'
+					  else document.getElementById('result').innerHTML = 'Este review foi classificado como: <b class="text-success">Verdadeiro</b>'
+				  else alert('Erro\nRequisição Inválida!')
+			 })
+			 .fail(function(jqXHR, textStatus, msg){
+				  alert(msg);
+			 });
+		 });
+		
+		 setInterval(function() {
+		 	$.ajax({
+				  url : "example",
+				  type : 'post',
+				  data : {},
+				  beforeSend : function(){
+					   console.log('Enviando...')
+				  }
+			 })
+			 .done(function(msg){
+		     	document.getElementById('suggest-container').innerHTML = msg.example + '<i><br><br>Esse review é: ' + msg.category + '</i>'
+			 })
+			 .fail(function(jqXHR, textStatus, msg){
+				  alert(msg);
+			 });
+		 }, 60 * 1000);
+	</script>
+</html>
