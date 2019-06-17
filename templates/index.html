@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>Deteção de fake review</title>
+		<title>Detecção de fake review</title>
 		<link rel="stylesheet" 
 			  href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
 			  integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -41,6 +41,10 @@
 				text-align: justify;
 			}
 
+			.recommend {
+				font-size: 10px;
+			}
+
             @media (max-width: 1200px) {
                 body {
                     font-size: 0.9em !important;
@@ -53,20 +57,40 @@
 			<h3><center><b>DETECÇÃO DE FAKE REVIEW</b></center></h3>
 		</header>
 		<div class="col-12 d-flex d-flex-row flex-wrap justify-content-center mt-4">
+				<div class="col-sm-8 col-md-8 col-lg-8  p-4 mb-3 box">
+					A demonstração a seguir utiliza diferentes algoritmos para classificar reviews de acordo com sua autenticidade.
+					<br>
+					Para classificação com base de treinamento de diferentes polaridades são usados os seguintes algoritmos:
+					<br>
+					<ul>
+						<li>Reviews positivos: Redes Neurais.</li>
+						<li>Reviews negativos: Regressão Logística.</li>
+						<li>Reviews positivos e negativos: Redes Neurais.</li>
+					</ul>
+				</div>
+					
+		</div>
+		<div class="col-12 d-flex d-flex-row flex-wrap justify-content-center mt-4">
 			<div class="col-sm-12 col-md-6 col-lg-5 mb-3">
 				<div class="p-3 box">
 					<div class="form-group">
 						<label for="textToAnalize">Digite aqui o texto a ser analizado:</label>
 						<textarea class="form-control" id="textToAnalize" rows="12"></textarea>
+						<div class="mt-2 text-right">
+							<button id="limpar" type="button" class="btn btn-outline-primary">Limpar</button>
+						</div>
 					</div>
-					<div class="d-flex d-flex-row flex-wrap">
+					<div>
+						Escolha polaridade de reviews para treinamento: <br>
+						<span class="recommend"><i>Recomendação para melhor resultado: Ambos</i></span>
+					</div>
+						<div class="d-flex d-flex-row flex-wrap">
 						<select class="custom-select col-sm-12 col-md-12 col-lg-8 mb-sm-3 mb-md-3 mb-lg-0" id="polaridade">
-							<option selected>Escolha a polaridade do review...</option>
+							<option value="both" selected>Ambos</option>
 							<option value="positive">Positivo</option>
 							<option value="negative">Negativo</option>
-							<option value="both">Ambos</option>
 						</select>
-						<div class="col-sm-12 col-md-12 col-lg-4 pr-0 pl-sm-0 pl-md-0 pl-lg-3"><button type="button" class="btn btn-outline-primary btn-block">Executar</button></div>
+						<div class="col-sm-12 col-md-12 col-lg-4 pr-0 pl-sm-0 pl-md-0 pl-lg-3"><button id="executar" type="button" class="btn btn-outline-primary btn-block">Executar</button></div>
 					</div>
 				</div>
 				<div class="p-3 mt-3 box" id='result'>
@@ -79,21 +103,40 @@
                     <p class="text-muted">Para saber mais sobre este projeto clique <a href='https://drive.google.com/file/d/1jnaD_iGn6b7svogVKp30d8scd6LwkzKL/view?usp=sharing'>aqui</a>.</p>
                     <hr>
                     <h4>Exemplos</h4>
-                    <p class="text-muted">Abaixo seguem alguns exemplos de reviews. Sinta-se a vontade para utilizá-los :)</p>
-                    <div id='suggest-container'>
-                        Affinia Chicago is one of the worst hotels I have ever stayed at. Not in my life have I been treated so poorly as a guest. The front desk was very unaccommodating when I asked for a smoke free room when they had made an error in my reservation. There was no bellhop available for some strange reason so I had to move all my luggage to the elevator and down a long hallway to my room by myself. If it wasn't already a bad stay, I ordered room service and it took over an hour and a half to be delivered. If they didn't have air conditioning in the room, I would say just about everything about this stay was completely miserable. If you are traveling to Chicago for any kind of business, I hope you decide not to choose this hotel. I was quite surprised, I like Chicago as a city but this stay definitely made my trip quite a negative experience. <i><br><br>Esse review é: Negative, Deceptive</i>
-                    </div>
-                </div>
+                    <p class="text-muted">Abaixo seguem um exemplo de review.<br>Sinta-se a vontade para utilizá-lo :)</p>
+                    <div id='suggest-container'>Affinia Chicago is one of the worst hotels I have ever stayed at. Not in my life have I been treated so poorly as a guest. The front desk was very unaccommodating when I asked for a smoke free room when they had made an error in my reservation. There was no bellhop available for some strange reason so I had to move all my luggage to the elevator and down a long hallway to my room by myself. If it wasn't already a bad stay, I ordered room service and it took over an hour and a half to be delivered. If they didn't have air conditioning in the room, I would say just about everything about this stay was completely miserable. If you are traveling to Chicago for any kind of business, I hope you decide not to choose this hotel. I was quite surprised, I like Chicago as a city but this stay definitely made my trip quite a negative experience.</div>
+					<br>
+					<div id='suggest-polarity'>
+						<i>Esse review é: Negative, Deceptive</i>
+					</div>
+					<div class="mt-2 text-right">
+							<button id="copiar" type="button" class="btn btn-outline-primary">Copiar</button>
+						</div>
+				</div>
 			</div>
 		</div>
 	</body>
 	<footer>
 	</footer>
 	
-	<script>		
-		$('button').click(function(){
+	<script>
+		$('#limpar').click(function(){
+			$('#textToAnalize').val("");
+		});
+
+		$('#copiar').click(function(){
+			let example = document.getElementById('suggest-container').innerHTML;
+			$('#textToAnalize').val(example);
+		});
+
+		$('#executar').click(function(){
 			let review = $('#textToAnalize').val();
 			let option = $('#polaridade').val();
+
+			if(!review || !option) {
+				alert('Erro:\nRequisição Inválida!\nCertifique-se de que todos os dados foram inseridos.');
+				return;
+			}
 						
 			$.ajax({
 				  url : "compute",
@@ -103,7 +146,7 @@
 					   text : review
 				  },
 				  beforeSend : function(){
-					   console.log('Enviando...')
+					   document.getElementById('result').innerHTML = 'Classificando...';
 				  }
 			 })
 			 .done(function(msg){
@@ -117,7 +160,7 @@
 			 });
 		 });
 		
-		 setInterval(function() {
+		setInterval(function() {
 		 	$.ajax({
 				  url : "example",
 				  type : 'post',
@@ -127,7 +170,8 @@
 				  }
 			 })
 			 .done(function(msg){
-		     	document.getElementById('suggest-container').innerHTML = msg.example + '<i><br><br>Esse review é: ' + msg.category + '</i>'
+		     	document.getElementById('suggest-container').innerHTML = msg.example;
+				document.getElementById('suggest-polarity').innerHTML = '<i>Esse review é: ' + msg.category + '</i>';
 			 })
 			 .fail(function(jqXHR, textStatus, msg){
 				  alert(msg);
